@@ -61,7 +61,7 @@ Fetch the given URL and perform a deep audit on that single page (plus robots.tx
 
 ## Step 2: Deep Per-Page Analysis
 
-**CRITICAL: Analyze EVERY page individually.** Do not skip pages or give generic assessments. For each page, examine the actual HTML and content against ALL 68 parameters below (58 per-page + 10 site-wide robots.txt/crawlability). For each parameter, assign:
+**CRITICAL: Analyze EVERY page individually.** Do not skip pages or give generic assessments. For each page, examine the actual HTML and content against ALL 66 parameters below (56 per-page across 6 categories + 10 site-wide robots.txt/crawlability). For each parameter, assign:
 - **PASS** (100 pts) — meets best practices
 - **WARNING** (50 pts) — partially meets, needs improvement
 - **FAIL** (0 pts) — missing or critically broken
@@ -79,15 +79,15 @@ For every single finding, you MUST provide:
 |---|-----------|------|---------|------|
 | 1 | **Viewport Meta Tag** | `<meta name="viewport">` present with `width=device-width, initial-scale=1` | Present but incomplete (missing initial-scale or width) | Missing entirely |
 | 2 | **Responsive CSS Indicators** | Media queries, flexbox, or CSS grid detected in inline/embedded styles | Partial responsive signals (only fixed widths) | No responsive indicators found |
-| 3 | **Image Alt Text Coverage** | >90% of `<img>` tags have meaningful, descriptive alt text | 50-90% coverage | <50% coverage or all empty alt="" |
-| 4 | **Image Format Optimization** | Modern formats (webp, avif) used or `srcset`/`<picture>` present | Mix of modern and legacy formats | Only legacy formats (jpg/png/gif) with no srcset |
-| 5 | **Navigation Structure** | `<nav>` element with clear links and `aria-label` present | `<nav>` present but no aria attributes | No `<nav>` element at all |
-| 6 | **CTA Presence** | Buttons/links with action words (buy, sign up, learn, get started, try, download, subscribe, contact) | Few CTAs found (only 1) | No clear CTAs anywhere on page |
-| 7 | **Semantic Layout** | Uses `<header>`, `<main>`, `<footer>`, `<aside>` properly | Some semantic elements present | No semantic elements — all `<div>` soup |
+| 3 | **Image Format Optimization** | Modern formats (webp, avif) used or `srcset`/`<picture>` present | Mix of modern and legacy formats | Only legacy formats (jpg/png/gif) with no srcset |
+| 4 | **Navigation Structure** | `<nav>` element with clear links and `aria-label` present | `<nav>` present but no aria attributes | No `<nav>` element at all |
+| 5 | **CTA Presence** | Buttons/links with action words (buy, sign up, learn, get started, try, download, subscribe, contact) | Few CTAs found (only 1) | No clear CTAs anywhere on page |
+| 6 | **Semantic Layout** | Uses `<header>`, `<main>`, `<footer>`, `<aside>` properly | Some semantic elements present | No semantic elements — all `<div>` soup |
+| 7 | **Page Load Indicators** | No render-blocking inline scripts >10KB, images have `loading="lazy"` or `width`/`height` set | Some large inline scripts or images without lazy loading | Massive inline scripts (>50KB), unoptimized images with no dimensions |
 
 **Per-parameter recommendation format:**
 - If FAIL on Viewport: "Add `<meta name="viewport" content="width=device-width, initial-scale=1.0">` inside `<head>`. Without this, mobile devices render the page at desktop width, hurting mobile usability and Google's mobile-first indexing."
-- If FAIL on Image Alt: "Found X images without alt text. Add descriptive alt text to each: `<img src="hero.jpg" alt="Team collaborating on marketing strategy in modern office">`. This helps screen readers, Google Image Search, and AI engines understand your visual content."
+- If FAIL on Page Load: "Found X images without `loading='lazy'` or width/height attributes. **Action:** Add `loading='lazy'` to below-the-fold images and always set explicit `width` and `height` to prevent layout shifts."
 
 ---
 
@@ -121,14 +121,13 @@ For every single finding, you MUST provide:
 | 6 | **URL Structure** | Clean, descriptive, lowercase, hyphenated | Has query parameters or mixed case | Long, numeric, deeply nested, or ugly |
 | 7 | **Internal Links** | 3+ internal links with descriptive anchor text | 1-2 internal links | No internal links (orphan page) |
 | 8 | **External Links** | External links present with proper `rel` attributes | External links without `rel="noopener"` | No external links (isolated page) |
-| 9 | **Image Alt Text (SEO)** | All images have keyword-relevant, descriptive alt text | Some images missing alt | Most images missing alt text |
-| 10 | **HTTPS** | URL uses HTTPS with valid certificate | HTTPS but with mixed content warnings | HTTP only (not secure) |
+| 9 | **Image Alt Text** | >90% of `<img>` tags have keyword-relevant, descriptive alt text | 50-90% of images have alt text | <50% of images have alt text or all empty `alt=""` |
+| 10 | **HTTPS** | URL uses HTTPS | N/A | HTTP only (not secure) |
 | 11 | **Open Graph Tags** | `og:title`, `og:description`, `og:image`, `og:url` all present | Partial OG tags (1-2 present) | No Open Graph tags |
 | 12 | **Twitter Card Tags** | `twitter:card`, `twitter:title`, `twitter:description` present | Partial Twitter tags | No Twitter Card tags |
 | 13 | **Hreflang** | Hreflang tags present for multi-language sites | Single language site (no hreflang needed — PASS) | Multi-language content detected but no hreflang |
 | 14 | **Language Attribute** | `<html lang="en">` (or appropriate language) present | Lang attribute present but potentially wrong | Missing lang attribute |
 | 15 | **Favicon** | `<link rel="icon">` present with multiple sizes | Present but only one size | Missing entirely |
-| 16 | **Structured Data Present** | JSON-LD or microdata found on page | Minimal structured data | No structured data at all |
 
 **Per-parameter recommendation format:**
 - If FAIL on Title Tag: "No `<title>` tag found. **Action:** Add `<title>[Primary Keyword] - [Compelling Benefit] | [Brand Name]</title>`. Example for this page: `<title>[specific suggestion based on page content]</title>`. Keep it 30-60 characters. The title tag is the #1 on-page SEO factor and appears as the clickable headline in Google search results."
@@ -137,7 +136,7 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 4: Robots.txt & Crawlability (Weight: 10%) — SITE-WIDE
+### Category 4: Robots.txt & Crawlability (Weight: 15%) — SITE-WIDE
 
 **This category is audited ONCE for the entire site (not per-page).** Fetch `{domain}/robots.txt` and `{domain}/sitemap.xml` and analyze them.
 
@@ -171,10 +170,9 @@ For every single finding, you MUST provide:
 | 2 | **Schema Types** | Rich types: Article, Product, Organization, LocalBusiness, FAQPage, HowTo | Only basic WebSite/WebPage schema | No schema types |
 | 3 | **FAQ Schema** | FAQPage schema with 3+ well-formed Q&A pairs | FAQ content exists in HTML but no FAQPage schema | No FAQ content or schema |
 | 4 | **Breadcrumb Schema** | BreadcrumbList schema present and matching visible breadcrumbs | Breadcrumb UI visible but no schema markup | No breadcrumbs at all |
-| 5 | **Heading Hierarchy Correctness** | No skipped levels (H1→H2→H3 in sequential order) | Minor skips (H1→H3) | Major skips or completely random heading levels |
-| 6 | **Semantic HTML Elements** | Uses `<article>`, `<section>`, `<nav>`, `<main>`, `<aside>`, `<figure>` | Some semantic elements | All `<div>` and `<span>` — no semantic HTML |
-| 7 | **Content Outline** | Clear, logical content outline derivable from heading structure | Partial outline, some sections have no headings | No discernible content structure |
-| 8 | **Nested Sections** | Content organized in logical `<section>` blocks with headings | Some sectioning but inconsistent | Flat structure with no section elements |
+| 5 | **Semantic HTML Elements** | Uses `<article>`, `<section>`, `<nav>`, `<main>`, `<aside>`, `<figure>` | Some semantic elements | All `<div>` and `<span>` — no semantic HTML |
+| 6 | **Content Outline** | Clear, logical content outline derivable from heading structure | Partial outline, some sections have no headings | No discernible content structure |
+| 7 | **Nested Sections** | Content organized in logical `<section>` blocks with headings | Some sectioning but inconsistent | Flat structure with no section elements |
 
 **Per-parameter recommendation format:**
 - If FAIL on JSON-LD: "No structured data found. **Action:** Add JSON-LD for this page type. Based on the page content, add this to `<head>`: ```json\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"[appropriate type]\",\n  [specific fields based on page content]\n}\n``` This helps Google show rich results (star ratings, FAQs, breadcrumbs, etc.) which increase CTR by 20-30%."
@@ -182,18 +180,18 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 6: AEO — Answer Engine Optimization (Weight: 10%)
+### Category 6: AEO — Answer Engine Optimization (Weight: 15%)
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
-| 1 | **FAQ Schema Quality** | FAQPage schema with 3+ well-formed Q&A pairs | FAQ schema with 1-2 Q&A pairs | No FAQ schema |
-| 2 | **Question-Based Headings** | 3+ H2/H3 tags phrased as questions (what, how, why, when, where, which, can, does, is, should) | 1-2 question-based headings | No question-based headings |
-| 3 | **Direct Answer Formatting** | Concise answers (40-60 words) immediately follow question headings in first paragraph | Answers present but verbose (>100 words before break) | No direct answers after question headings |
-| 4 | **Definition Patterns** | Content includes "X is...", "X refers to...", "X means..." definitional patterns | Some definitional content | No definitions at all |
-| 5 | **List-Based Answers** | Uses `<ol>`, `<ul>` for step-by-step or feature lists near question headings | Some lists but disconnected from questions | No list-based answers |
-| 6 | **Table Content** | `<table>` used for comparison, pricing, or data presentation | Tables present but poorly structured (missing headers) | No tables at all |
-| 7 | **How-To Structure** | Step-by-step numbered instructions or HowTo schema present | Some instructional content but not structured | No how-to or instructional content |
-| 8 | **Voice Search Readiness** | Conversational tone, natural language, question-answer format throughout | Partially conversational | Purely formal/jargon-heavy with no conversational elements |
+| 1 | **Question-Based Headings** | 3+ H2/H3 tags phrased as questions (what, how, why, when, where, which, can, does, is, should) | 1-2 question-based headings | No question-based headings |
+| 2 | **Direct Answer Formatting** | Concise answers (40-60 words) immediately follow question headings in first paragraph | Answers present but verbose (>100 words before break) | No direct answers after question headings |
+| 3 | **Definition Patterns** | Content includes "X is...", "X refers to...", "X means..." definitional patterns | Some definitional content | No definitions at all |
+| 4 | **List-Based Answers** | Uses `<ol>`, `<ul>` for step-by-step or feature lists near question headings | Some lists but disconnected from questions | No list-based answers |
+| 5 | **Table Content** | `<table>` used for comparison, pricing, or data presentation | Tables present but poorly structured (missing headers) | No tables at all |
+| 6 | **How-To Structure** | Step-by-step numbered instructions or HowTo schema present | Some instructional content but not structured | No how-to or instructional content |
+| 7 | **Voice Search Readiness** | Conversational tone, natural language, question-answer format throughout | Partially conversational | Purely formal/jargon-heavy with no conversational elements |
+| 8 | **Featured Snippet Readiness** | Content has definition paragraphs (<50 words), numbered lists, or comparison tables formatted for snippet extraction | Some snippet-ready content but not optimized | No content formatted for featured snippet extraction |
 
 **Per-parameter recommendation format:**
 - If FAIL on Question-Based Headings: "No question-based headings found. AI assistants (ChatGPT, Perplexity, Google AI Overview) prioritize content that directly answers questions. **Action:** Restructure headings to be questions your audience asks. Based on this page's content about [topic], add these headings:\n  - `<h2>What is [topic]?</h2>` followed by a 2-sentence definition\n  - `<h2>How does [topic] work?</h2>` followed by a step-by-step explanation\n  - `<h2>Why is [topic] important?</h2>` followed by 3 key benefits\n  - `<h2>How much does [topic] cost?</h2>` if relevant"
@@ -235,20 +233,23 @@ For every single finding, you MUST provide:
 Each category score = average of all parameter scores in that category (0-100).
 
 ### Per-Page Score
-Each page gets its own overall score (weighted sum of its category scores).
+Each page gets its own overall score = weighted sum of its 6 per-page category scores (56 checks) PLUS the site-wide Robots.txt & Crawlability score (which is the same for all pages).
+
+Formula: `Page Score = (Tech SEO × 0.20) + (GEO × 0.20) + (Robots.txt × 0.15) + (AEO × 0.15) + (Design × 0.10) + (Readability × 0.10) + (Structured Data × 0.10)`
 
 ### Overall Site Score (Crawl Mode)
-Average of all per-page scores.
+Average of all per-page scores (since robots.txt score is identical across pages, it naturally blends in).
 
-### Weighted Formula
-- Technical SEO: **20%**
-- GEO: **20%**
-- Design & UX: **10%**
-- Content Readability: **10%**
-- Robots.txt & Crawlability: **10%**
-- Content Hierarchy & Structured Data: **10%**
-- AEO: **10%**
-- *(Note: Robots.txt category is scored once for the entire site and applied to all pages)*
+### Weighted Formula (must total 100%)
+- Technical SEO: **20%** (15 per-page checks)
+- GEO: **20%** (12 per-page checks)
+- Robots.txt & Crawlability: **15%** (10 site-wide checks, scored once, same score applied to all pages)
+- Design & UX: **10%** (7 per-page checks)
+- Content Readability: **10%** (7 per-page checks)
+- Content Hierarchy & Structured Data: **10%** (7 per-page checks)
+- AEO: **15%** (8 per-page checks)
+
+**Total: 100% across 7 categories, 66 parameters (56 per-page + 10 site-wide)**
 
 ### Grade
 - **90-100**: Excellent
@@ -275,6 +276,8 @@ For EVERY finding that is WARNING or FAIL, generate a recommendation with:
 ### Priority Levels
 
 **CRITICAL (Fix Immediately)**
+- `Disallow: /` in robots.txt (blocks entire site)
+- All AI crawlers blocked (invisible to ChatGPT, Perplexity, Google AI Overview)
 - Missing title tags
 - No H1 tag
 - HTTP instead of HTTPS
@@ -282,6 +285,8 @@ For EVERY finding that is WARNING or FAIL, generate a recommendation with:
 - No structured data on any page
 - Zero internal links (orphan pages)
 - No meta descriptions
+- No robots.txt file
+- No sitemap.xml
 
 **HIGH (Fix This Week)**
 - Missing Open Graph tags
@@ -335,12 +340,13 @@ In crawl mode, after global recommendations, provide **page-specific recommendat
 
 After individual page analysis, provide site-wide insights:
 
-1. **Internal Linking Map** — which pages link to which, identify orphan pages
-2. **Content Gaps** — topics the site should cover but doesn't
-3. **Schema Coverage** — which pages have/lack structured data
-4. **Consistency Issues** — brand name variations, different navigation structures
-5. **Strongest Page** — highest scoring page and why
-6. **Weakest Page** — lowest scoring page and what to prioritize
+1. **Robots.txt & Sitemap Summary** — full robots.txt analysis, which pages are in sitemap vs discovered during crawl, AI bot blocking status
+2. **Internal Linking Map** — which pages link to which, identify orphan pages, pages missing from navigation
+3. **Content Gaps** — topics the site should cover but doesn't, based on existing content themes
+4. **Schema Coverage** — which pages have/lack structured data, which schema types are used vs missing
+5. **Consistency Issues** — brand name variations, different navigation structures, inconsistent meta tag patterns
+6. **Strongest Page** — highest scoring page and why
+7. **Weakest Page** — lowest scoring page and what to prioritize
 
 ---
 
