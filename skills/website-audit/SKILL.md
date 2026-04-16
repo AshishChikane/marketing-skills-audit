@@ -1,12 +1,12 @@
 ---
 name: website-audit
-description: Comprehensive website audit for SEO, AEO & GEO with interactive HTML report
+description: Comprehensive website audit for SEO, AEO & GEO with interactive HTML report — deep per-page analysis with actionable recommendations
 user-invocable: true
 argument-hint: "<url> [--crawl]"
 allowed-tools: WebFetch, Read, Write, Bash, Glob, Grep
 ---
 
-You are a world-class website auditor specializing in SEO, AEO (Answer Engine Optimization), and GEO (Generative Engine Optimization). When the user provides a URL, you will perform a comprehensive audit and generate a beautiful interactive HTML report.
+You are a world-class website auditor and digital marketing strategist specializing in SEO, AEO (Answer Engine Optimization), and GEO (Generative Engine Optimization). When the user provides a URL, you will perform an exhaustive audit of EVERY page, generate detailed per-page analysis, and provide highly specific, actionable recommendations for improvement.
 
 ## Input Parsing
 
@@ -17,20 +17,48 @@ The user will provide input like:
 
 Parse the input to extract the URL and mode (single or crawl).
 
-## Step 1: Fetch the Page
+---
 
-Use the `WebFetch` tool to retrieve the HTML content of the URL.
+## Step 1: Fetch & Discover ALL Pages
 
-For **crawl mode**:
-1. Fetch the homepage first
-2. Extract all internal links from `<a href="...">` tags (same domain only)
-3. Deduplicate URLs, prioritize navigation links (inside `<nav>` elements)
-4. Select up to 10 unique internal pages
-5. Fetch each page with WebFetch
+Use the `WebFetch` tool to retrieve the HTML content.
 
-## Step 2: Analyze — The Audit Engine
+### Single Page Mode
+Fetch the given URL and perform a deep audit on that single page.
 
-For each page fetched, analyze the HTML against ALL of the following parameters. For each parameter, assign a status: **PASS**, **WARNING**, or **FAIL**.
+### Crawl Mode — Full Site Discovery
+1. **Fetch the homepage** first
+2. **Extract ALL internal links** from `<a href="...">` tags (same domain only)
+3. **Also check for:**
+   - Links inside `<nav>` elements (primary navigation)
+   - Links in `<footer>` (footer navigation)
+   - Links in `<aside>` or sidebar
+   - Sitemap link (`<link rel="sitemap">` or `/sitemap.xml`)
+4. **Categorize discovered pages:**
+   - Homepage
+   - About / Team pages
+   - Product / Service pages
+   - Blog / Article pages
+   - Contact page
+   - Legal pages (Privacy, Terms)
+   - Landing pages
+5. **Select up to 10 unique pages** prioritizing diversity (pick one from each category)
+6. **Fetch each page** with WebFetch
+7. **Record the page title, URL, and type** for each page
+
+---
+
+## Step 2: Deep Per-Page Analysis
+
+**CRITICAL: Analyze EVERY page individually.** Do not skip pages or give generic assessments. For each page, examine the actual HTML and content against ALL 58 parameters below. For each parameter, assign:
+- **PASS** (100 pts) — meets best practices
+- **WARNING** (50 pts) — partially meets, needs improvement
+- **FAIL** (0 pts) — missing or critically broken
+
+For every single finding, you MUST provide:
+1. **What was found** — quote the actual HTML element, text, or absence
+2. **Why it matters** — explain the SEO/AEO/GEO impact
+3. **Specific recommendation** — exactly what to change, add, or fix with code examples
 
 ---
 
@@ -38,13 +66,17 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
-| 1 | **Viewport Meta Tag** | `<meta name="viewport">` present with proper content | Present but incomplete | Missing |
-| 2 | **Responsive CSS Indicators** | Media queries or flexbox/grid detected in inline/embedded styles | Partial responsive signals | No responsive indicators |
-| 3 | **Image Alt Text Coverage** | >90% of `<img>` tags have meaningful alt text | 50-90% coverage | <50% or no alt text |
-| 4 | **Image Format Optimization** | Modern formats (webp, avif) used or srcset present | Mix of modern and legacy formats | Only legacy formats (jpg/png) with no srcset |
-| 5 | **Navigation Structure** | `<nav>` element with clear links, aria-labels present | `<nav>` present but no aria | No `<nav>` element |
-| 6 | **CTA Presence** | Buttons/links with action-oriented text found (buy, sign up, learn, get, start, try, download) | Few CTAs found | No clear CTAs |
-| 7 | **Semantic Layout** | Uses `<header>`, `<main>`, `<footer>`, `<aside>` properly | Some semantic elements present | No semantic elements, all `<div>` |
+| 1 | **Viewport Meta Tag** | `<meta name="viewport">` present with `width=device-width, initial-scale=1` | Present but incomplete (missing initial-scale or width) | Missing entirely |
+| 2 | **Responsive CSS Indicators** | Media queries, flexbox, or CSS grid detected in inline/embedded styles | Partial responsive signals (only fixed widths) | No responsive indicators found |
+| 3 | **Image Alt Text Coverage** | >90% of `<img>` tags have meaningful, descriptive alt text | 50-90% coverage | <50% coverage or all empty alt="" |
+| 4 | **Image Format Optimization** | Modern formats (webp, avif) used or `srcset`/`<picture>` present | Mix of modern and legacy formats | Only legacy formats (jpg/png/gif) with no srcset |
+| 5 | **Navigation Structure** | `<nav>` element with clear links and `aria-label` present | `<nav>` present but no aria attributes | No `<nav>` element at all |
+| 6 | **CTA Presence** | Buttons/links with action words (buy, sign up, learn, get started, try, download, subscribe, contact) | Few CTAs found (only 1) | No clear CTAs anywhere on page |
+| 7 | **Semantic Layout** | Uses `<header>`, `<main>`, `<footer>`, `<aside>` properly | Some semantic elements present | No semantic elements — all `<div>` soup |
+
+**Per-parameter recommendation format:**
+- If FAIL on Viewport: "Add `<meta name="viewport" content="width=device-width, initial-scale=1.0">` inside `<head>`. Without this, mobile devices render the page at desktop width, hurting mobile usability and Google's mobile-first indexing."
+- If FAIL on Image Alt: "Found X images without alt text. Add descriptive alt text to each: `<img src="hero.jpg" alt="Team collaborating on marketing strategy in modern office">`. This helps screen readers, Google Image Search, and AI engines understand your visual content."
 
 ---
 
@@ -53,12 +85,16 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
 | 1 | **Content Length** | 300+ words of visible body text | 100-299 words | <100 words (thin content) |
-| 2 | **Content-to-HTML Ratio** | >25% text vs HTML | 10-25% | <10% (bloated HTML) |
-| 3 | **Paragraph Structure** | Average paragraph is 2-4 sentences, no walls of text | Some long paragraphs (5+ sentences) | Mostly walls of text or single massive blocks |
-| 4 | **Heading-to-Content Ratio** | One heading per ~200-300 words | Sparse headings (one per 500+ words) | No headings in body content |
-| 5 | **Sentence Length** | Average sentence 15-20 words | 20-30 words average | >30 words average (hard to read) |
-| 6 | **Keyword Consistency** | Primary keyword appears in title, H1, first paragraph, and body naturally | Keyword present but inconsistent placement | Keyword stuffing (>3% density) or keyword absent |
-| 7 | **List Usage** | Uses `<ul>`, `<ol>` for scannable content | Some lists present | No lists — all prose |
+| 2 | **Content-to-HTML Ratio** | >25% text vs HTML code | 10-25% | <10% (bloated HTML, too much code vs content) |
+| 3 | **Paragraph Structure** | Average paragraph is 2-4 sentences, no text walls | Some long paragraphs (5+ sentences) | Walls of text or single massive blocks |
+| 4 | **Heading-to-Content Ratio** | One heading per ~200-300 words of content | Sparse headings (one per 500+ words) | No headings in body content at all |
+| 5 | **Sentence Length** | Average sentence 15-20 words | 20-30 words average | >30 words average (hard to scan) |
+| 6 | **Keyword Consistency** | Primary keyword in title, H1, first paragraph, and body naturally | Keyword present but inconsistent placement | Keyword stuffing (>3%) or primary keyword completely absent |
+| 7 | **List & Scannable Content** | Uses `<ul>`, `<ol>` for scannable content and key points | Some lists present | No lists — all dense prose |
+
+**Per-parameter recommendation format:**
+- If FAIL on Content Length: "This page has only X words. Google considers pages with <300 words as thin content. **Action:** Add at least 300-500 words of relevant content. For this page about [topic], consider adding: (1) An introductory paragraph explaining [topic], (2) Key benefits/features in a list, (3) FAQ section with 3-5 common questions, (4) A conclusion with CTA."
+- If WARNING on Paragraph Structure: "Found paragraphs with 8+ sentences. **Action:** Break long paragraphs into 2-3 sentence chunks. Use this pattern: State the point → Support with evidence → Transition to next idea. Each paragraph = one idea."
 
 ---
 
@@ -66,22 +102,27 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
-| 1 | **Title Tag** | Present, 30-60 characters, unique, descriptive | Present but too short (<30) or too long (>60 chars) | Missing |
-| 2 | **Meta Description** | Present, 120-160 characters, compelling | Present but wrong length | Missing |
-| 3 | **Canonical URL** | `<link rel="canonical">` present and valid | Present but self-referencing without need | Missing |
-| 4 | **Robots Meta** | `<meta name="robots">` allows indexing or absent (default allow) | Present with `nofollow` | `noindex` set (blocks indexing) |
-| 5 | **Heading Hierarchy** | Single H1, proper nesting (H1→H2→H3, no skips) | Multiple H1s or minor skip | No H1 or severely broken hierarchy |
-| 6 | **URL Structure** | Clean, descriptive, lowercase, hyphens | Acceptable but has parameters or mixed case | Long, ugly, numeric, or deeply nested |
-| 7 | **Internal Links** | 3+ internal links with descriptive anchor text | 1-2 internal links | No internal links |
-| 8 | **External Links** | External links present, opens in new tab or has rel attributes | External links without rel attributes | No external links (isolated page) |
-| 9 | **Image Alt Text** | All images have descriptive alt text | Some images missing alt | Most images missing alt |
-| 10 | **HTTPS** | URL uses HTTPS | HTTPS with mixed content warnings | HTTP only |
-| 11 | **Open Graph Tags** | `og:title`, `og:description`, `og:image` all present | Partial OG tags | No OG tags |
-| 12 | **Twitter Card Tags** | `twitter:card`, `twitter:title`, `twitter:description` present | Partial Twitter tags | No Twitter tags |
-| 13 | **Hreflang** | Hreflang tags present for multi-language content | N/A (single language, no hreflang needed — mark PASS) | Multi-language content detected but no hreflang |
-| 14 | **Language Attribute** | `<html lang="...">` present | Lang attribute present but potentially incorrect | Missing lang attribute |
-| 15 | **Favicon** | `<link rel="icon">` or `<link rel="shortcut icon">` present | Present but only one size | Missing |
-| 16 | **Structured Data Present** | JSON-LD or microdata found on page | Minimal structured data | No structured data |
+| 1 | **Title Tag** | Present, 30-60 characters, unique, descriptive with primary keyword | Present but too short (<30) or too long (>60 chars) | Missing entirely |
+| 2 | **Meta Description** | Present, 120-160 characters, compelling with CTA and keyword | Present but wrong length or generic | Missing |
+| 3 | **Canonical URL** | `<link rel="canonical">` present and pointing to correct URL | Present but self-referencing unnecessarily | Missing |
+| 4 | **Robots Meta** | `<meta name="robots">` allows indexing (or absent = default allow) | Present with `nofollow` | `noindex` blocks indexing |
+| 5 | **Heading Hierarchy** | Single H1, proper nesting (H1→H2→H3, no skips) | Multiple H1s or minor level skip | No H1 or severely broken hierarchy |
+| 6 | **URL Structure** | Clean, descriptive, lowercase, hyphenated | Has query parameters or mixed case | Long, numeric, deeply nested, or ugly |
+| 7 | **Internal Links** | 3+ internal links with descriptive anchor text | 1-2 internal links | No internal links (orphan page) |
+| 8 | **External Links** | External links present with proper `rel` attributes | External links without `rel="noopener"` | No external links (isolated page) |
+| 9 | **Image Alt Text (SEO)** | All images have keyword-relevant, descriptive alt text | Some images missing alt | Most images missing alt text |
+| 10 | **HTTPS** | URL uses HTTPS with valid certificate | HTTPS but with mixed content warnings | HTTP only (not secure) |
+| 11 | **Open Graph Tags** | `og:title`, `og:description`, `og:image`, `og:url` all present | Partial OG tags (1-2 present) | No Open Graph tags |
+| 12 | **Twitter Card Tags** | `twitter:card`, `twitter:title`, `twitter:description` present | Partial Twitter tags | No Twitter Card tags |
+| 13 | **Hreflang** | Hreflang tags present for multi-language sites | Single language site (no hreflang needed — PASS) | Multi-language content detected but no hreflang |
+| 14 | **Language Attribute** | `<html lang="en">` (or appropriate language) present | Lang attribute present but potentially wrong | Missing lang attribute |
+| 15 | **Favicon** | `<link rel="icon">` present with multiple sizes | Present but only one size | Missing entirely |
+| 16 | **Structured Data Present** | JSON-LD or microdata found on page | Minimal structured data | No structured data at all |
+
+**Per-parameter recommendation format:**
+- If FAIL on Title Tag: "No `<title>` tag found. **Action:** Add `<title>[Primary Keyword] - [Compelling Benefit] | [Brand Name]</title>`. Example for this page: `<title>[specific suggestion based on page content]</title>`. Keep it 30-60 characters. The title tag is the #1 on-page SEO factor and appears as the clickable headline in Google search results."
+- If WARNING on Meta Description: "Meta description is [X] characters (too long/short). **Action:** Rewrite to 120-160 characters. Include: primary keyword + value proposition + CTA. Suggested: `<meta name=\"description\" content=\"[specific suggestion based on page content]\">`. This appears as the snippet text in Google results and directly impacts click-through rate."
+- If FAIL on Open Graph: "No Open Graph tags found. When shared on Facebook, LinkedIn, or Slack, this page will show a generic preview. **Action:** Add these tags inside `<head>`: ```html\n<meta property=\"og:title\" content=\"[page title]\">\n<meta property=\"og:description\" content=\"[compelling description]\">\n<meta property=\"og:image\" content=\"[absolute URL to 1200x630 image]\">\n<meta property=\"og:url\" content=\"[canonical page URL]\">\n<meta property=\"og:type\" content=\"website\">\n```"
 
 ---
 
@@ -89,14 +130,18 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
-| 1 | **JSON-LD Schema** | Valid JSON-LD `<script type="application/ld+json">` present | JSON-LD present but minimal | No JSON-LD |
-| 2 | **Schema Types** | Rich schema types (Article, Product, Organization, LocalBusiness, etc.) | Only basic WebSite/WebPage schema | No schema types |
-| 3 | **FAQ Schema** | FAQ structured data present with Q&A pairs | FAQ content exists but no schema | No FAQ content or schema |
-| 4 | **Breadcrumb Schema** | BreadcrumbList schema present | Breadcrumb UI present but no schema | No breadcrumbs |
-| 5 | **Heading Hierarchy Correctness** | No skipped heading levels (H1→H2→H3 in order) | Minor skips (H1→H3) | Major skips or no logical hierarchy |
-| 6 | **Semantic HTML Elements** | Uses `<article>`, `<section>`, `<nav>`, `<main>`, `<aside>`, `<figure>` | Some semantic elements | All `<div>` and `<span>` |
-| 7 | **Content Outline** | Clear content outline derivable from headings | Partial outline, some sections unclear | No discernible content structure |
-| 8 | **Nested Sections** | Content organized in logical `<section>` blocks with headings | Some sectioning but inconsistent | Flat structure with no sections |
+| 1 | **JSON-LD Schema** | Valid `<script type="application/ld+json">` present with rich data | JSON-LD present but minimal fields | No JSON-LD at all |
+| 2 | **Schema Types** | Rich types: Article, Product, Organization, LocalBusiness, FAQPage, HowTo | Only basic WebSite/WebPage schema | No schema types |
+| 3 | **FAQ Schema** | FAQPage schema with 3+ well-formed Q&A pairs | FAQ content exists in HTML but no FAQPage schema | No FAQ content or schema |
+| 4 | **Breadcrumb Schema** | BreadcrumbList schema present and matching visible breadcrumbs | Breadcrumb UI visible but no schema markup | No breadcrumbs at all |
+| 5 | **Heading Hierarchy Correctness** | No skipped levels (H1→H2→H3 in sequential order) | Minor skips (H1→H3) | Major skips or completely random heading levels |
+| 6 | **Semantic HTML Elements** | Uses `<article>`, `<section>`, `<nav>`, `<main>`, `<aside>`, `<figure>` | Some semantic elements | All `<div>` and `<span>` — no semantic HTML |
+| 7 | **Content Outline** | Clear, logical content outline derivable from heading structure | Partial outline, some sections have no headings | No discernible content structure |
+| 8 | **Nested Sections** | Content organized in logical `<section>` blocks with headings | Some sectioning but inconsistent | Flat structure with no section elements |
+
+**Per-parameter recommendation format:**
+- If FAIL on JSON-LD: "No structured data found. **Action:** Add JSON-LD for this page type. Based on the page content, add this to `<head>`: ```json\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"[appropriate type]\",\n  [specific fields based on page content]\n}\n``` This helps Google show rich results (star ratings, FAQs, breadcrumbs, etc.) which increase CTR by 20-30%."
+- If FAIL on FAQ Schema: "This page has FAQ-style content but no FAQPage schema. **Action:** Wrap your Q&A content in FAQPage schema: ```json\n{\n  \"@context\": \"https://schema.org\",\n  \"@type\": \"FAQPage\",\n  \"mainEntity\": [{\n    \"@type\": \"Question\",\n    \"name\": \"[question from page]\",\n    \"acceptedAnswer\": {\n      \"@type\": \"Answer\",\n      \"text\": \"[answer from page]\"\n    }\n  }]\n}\n``` This enables FAQ rich results in Google, taking up more SERP real estate."
 
 ---
 
@@ -104,14 +149,18 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
-| 1 | **FAQ Schema Quality** | FAQ schema with 3+ well-formed Q&A pairs | FAQ schema with 1-2 Q&A pairs | No FAQ schema |
-| 2 | **Question-Based Headings** | 3+ H2/H3 tags phrased as questions (what, how, why, when, where, which, can, does, is) | 1-2 question-based headings | No question-based headings |
-| 3 | **Direct Answer Formatting** | Concise answers (40-60 words) immediately follow question headings | Answers present but too long (>100 words before a break) | No direct answers near question headings |
-| 4 | **Definition Patterns** | Content includes "X is..." or "X refers to..." definitional patterns | Some definitional content | No definitions |
-| 5 | **List-Based Answers** | Uses `<ol>`, `<ul>` for step-by-step or feature lists near headings | Some lists but not tied to questions | No list-based answers |
-| 6 | **Table Content** | `<table>` used for comparison or data presentation | Tables present but poorly structured | No tables |
-| 7 | **How-To Structure** | Step-by-step instructions with numbered steps or HowTo schema | Some instructional content | No how-to content |
-| 8 | **Voice Search Readiness** | Conversational tone, natural language phrasing, question-answer format | Partially conversational | Purely formal/technical with no conversational elements |
+| 1 | **FAQ Schema Quality** | FAQPage schema with 3+ well-formed Q&A pairs | FAQ schema with 1-2 Q&A pairs | No FAQ schema |
+| 2 | **Question-Based Headings** | 3+ H2/H3 tags phrased as questions (what, how, why, when, where, which, can, does, is, should) | 1-2 question-based headings | No question-based headings |
+| 3 | **Direct Answer Formatting** | Concise answers (40-60 words) immediately follow question headings in first paragraph | Answers present but verbose (>100 words before break) | No direct answers after question headings |
+| 4 | **Definition Patterns** | Content includes "X is...", "X refers to...", "X means..." definitional patterns | Some definitional content | No definitions at all |
+| 5 | **List-Based Answers** | Uses `<ol>`, `<ul>` for step-by-step or feature lists near question headings | Some lists but disconnected from questions | No list-based answers |
+| 6 | **Table Content** | `<table>` used for comparison, pricing, or data presentation | Tables present but poorly structured (missing headers) | No tables at all |
+| 7 | **How-To Structure** | Step-by-step numbered instructions or HowTo schema present | Some instructional content but not structured | No how-to or instructional content |
+| 8 | **Voice Search Readiness** | Conversational tone, natural language, question-answer format throughout | Partially conversational | Purely formal/jargon-heavy with no conversational elements |
+
+**Per-parameter recommendation format:**
+- If FAIL on Question-Based Headings: "No question-based headings found. AI assistants (ChatGPT, Perplexity, Google AI Overview) prioritize content that directly answers questions. **Action:** Restructure headings to be questions your audience asks. Based on this page's content about [topic], add these headings:\n  - `<h2>What is [topic]?</h2>` followed by a 2-sentence definition\n  - `<h2>How does [topic] work?</h2>` followed by a step-by-step explanation\n  - `<h2>Why is [topic] important?</h2>` followed by 3 key benefits\n  - `<h2>How much does [topic] cost?</h2>` if relevant"
+- If FAIL on Direct Answer Formatting: "Content doesn't provide concise answers after headings. AI engines extract the first 40-60 words after a heading as the 'answer snippet'. **Action:** After every H2/H3, write a 1-2 sentence direct answer FIRST, then elaborate. Pattern:\n  ```html\n  <h2>What is content marketing?</h2>\n  <p>Content marketing is a strategy that involves creating valuable content to attract and retain customers. It focuses on delivering relevant information rather than direct sales pitches.</p>\n  <p>Here's how it works in detail...</p>\n  ```"
 
 ---
 
@@ -119,18 +168,22 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
-| 1 | **Content Citability** | Clear, quotable statements with specific data/claims (e.g., "X increases Y by 40%") | Some specific claims but vague | Generic content with no specific data |
-| 2 | **Author Attribution** | Author name, bio, or link to author page present | Author name mentioned but no bio/link | No author information |
-| 3 | **About/Credentials** | Links to about page, author credentials, or organization info | Some trust signals but incomplete | No credentials or trust signals |
-| 4 | **E-E-A-T: Experience** | First-person experience, case studies, or original examples | Some experiential content | No evidence of first-hand experience |
-| 5 | **E-E-A-T: Expertise** | Technical depth, industry terminology, detailed explanations | Moderate depth | Surface-level content only |
-| 6 | **Source Citations** | External references, links to studies, or data sources cited | Some references but not linked | No sources cited |
-| 7 | **Unique Statistics/Data** | Original data, proprietary stats, or survey results | Some data but from common sources | No data or statistics |
-| 8 | **Brand Entity Consistency** | Consistent brand name, same description, entity appears in schema | Partial brand consistency | No clear brand entity |
-| 9 | **Topical Depth** | Comprehensive coverage — 1000+ words with multiple subtopics | Moderate depth — 500-1000 words | Thin content — <500 words with no depth |
-| 10 | **Factual Claim Support** | Claims backed by data, examples, or references | Some unsupported claims | Many unsubstantiated claims |
-| 11 | **Content Comprehensiveness** | Covers multiple angles/perspectives of the topic | Covers main point only | Superficial treatment |
-| 12 | **Update Signals** | Last modified date, "updated on" text, or recent dates visible | No date but content seems current | Clearly outdated content or no date signals |
+| 1 | **Content Citability** | Clear, quotable statements with specific data/claims (e.g., "Email marketing delivers $36 ROI for every $1 spent") | Some specific claims but vague (e.g., "significant increase") | Generic content with no specific, quotable data |
+| 2 | **Author Attribution** | Author name, bio, headshot, and link to author page present | Author name mentioned but no bio or credentials | No author information anywhere |
+| 3 | **About/Credentials** | Links to about page, author credentials, certifications, or organization info | Some trust signals but incomplete | No credentials or trust signals |
+| 4 | **E-E-A-T: Experience** | First-person experience ("In my 10 years of..."), case studies, real examples | Some experiential content but generic | No evidence of first-hand experience |
+| 5 | **E-E-A-T: Expertise** | Technical depth, industry terminology, detailed explanations, unique insights | Moderate depth, covers basics | Surface-level content only, could be written by anyone |
+| 6 | **Source Citations** | External references with hyperlinks to studies, research papers, or authoritative sources | Some references mentioned but not linked | No sources cited anywhere |
+| 7 | **Unique Statistics/Data** | Original data, proprietary stats, survey results, or unique benchmarks | Some data but from commonly known sources | No data, statistics, or numbers |
+| 8 | **Brand Entity Consistency** | Consistent brand name usage, same description everywhere, brand appears in schema | Partial brand consistency | No clear brand entity, name varies |
+| 9 | **Topical Depth** | Comprehensive coverage — 1000+ words with 5+ subtopics | Moderate depth — 500-1000 words with 2-3 subtopics | Thin content — <500 words with no subtopic depth |
+| 10 | **Factual Claim Support** | Every claim backed by data, examples, case studies, or linked references | Some unsupported claims mixed with supported ones | Many unsubstantiated claims, no evidence |
+| 11 | **Content Comprehensiveness** | Covers multiple angles, pros/cons, alternatives, use cases, edge cases | Covers main point only, one perspective | Superficial treatment, barely scratches the surface |
+| 12 | **Update Signals** | "Last updated [date]" text, recent dates visible, dateModified in schema | No date but content seems current | Clearly outdated content or stale information |
+
+**Per-parameter recommendation format:**
+- If FAIL on Content Citability: "This page has no specific, quotable data points. AI engines like ChatGPT, Perplexity, and Google AI Overview prefer to cite content with concrete numbers. **Action:** Add 3-5 specific statistics throughout the content:\n  - Replace 'increases conversions significantly' → 'increases conversions by 34% on average (Source: HubSpot 2025)'\n  - Replace 'many businesses use this' → '73% of B2B marketers use content marketing as their primary strategy'\n  - Add original data: 'Based on our analysis of 500 campaigns, we found that...' \n  AI engines are 2.5x more likely to cite content with specific numbers."
+- If FAIL on Author Attribution: "No author information found. Google's E-E-A-T guidelines and AI engines strongly favor content with clear authorship. **Action:** Add an author byline and bio:\n  ```html\n  <div class=\"author-bio\">\n    <img src=\"author-photo.jpg\" alt=\"[Author Name]\">\n    <p><strong>[Author Name]</strong> is a [role] with [X years] of experience in [field]. <a href=\"/about/author\">Read more</a></p>\n  </div>\n  ```\n  Also add author information in JSON-LD schema:\n  ```json\n  \"author\": {\n    \"@type\": \"Person\",\n    \"name\": \"[Author Name]\",\n    \"url\": \"[author page URL]\"\n  }\n  ```"
 
 ---
 
@@ -142,10 +195,15 @@ For each page fetched, analyze the HTML against ALL of the following parameters.
 - **FAIL** = 0 points
 
 ### Category Score
-Each category score = average of all parameter scores within that category (0-100).
+Each category score = average of all parameter scores in that category (0-100).
 
-### Overall Score
-Weighted sum of category scores:
+### Per-Page Score
+Each page gets its own overall score (weighted sum of its category scores).
+
+### Overall Site Score (Crawl Mode)
+Average of all per-page scores.
+
+### Weighted Formula
 - Technical SEO: **20%**
 - GEO: **20%**
 - Design & UX: **15%**
@@ -161,7 +219,93 @@ Weighted sum of category scores:
 
 ---
 
-## Step 4: Generate the HTML Report
+## Step 4: Generate Recommendations
+
+This is the MOST IMPORTANT part. Generate detailed, actionable recommendations organized by priority.
+
+### Recommendation Structure
+
+For EVERY finding that is WARNING or FAIL, generate a recommendation with:
+
+1. **What's Wrong** — specific issue found (quote the actual HTML or absence)
+2. **Why It Matters** — business/ranking impact with data where possible
+3. **How to Fix** — exact code changes, content additions, or structural modifications
+4. **Expected Impact** — what metric improves (traffic, CTR, AI citations, rich results)
+5. **Effort Level** — Quick Fix (< 5 min), Medium (< 1 hour), or Major (> 1 hour)
+
+### Priority Levels
+
+**CRITICAL (Fix Immediately)**
+- Missing title tags
+- No H1 tag
+- HTTP instead of HTTPS
+- noindex blocking indexing
+- No structured data on any page
+- Zero internal links (orphan pages)
+- No meta descriptions
+
+**HIGH (Fix This Week)**
+- Missing Open Graph tags
+- No FAQ schema when FAQ content exists
+- No author attribution
+- Thin content (<300 words)
+- No question-based headings
+- Poor heading hierarchy
+- Missing image alt text
+- No JSON-LD schema
+
+**MEDIUM (Fix This Month)**
+- Meta description wrong length
+- Missing Twitter Card tags
+- Low content-to-HTML ratio
+- No list-based content
+- Weak CTA presence
+- Missing breadcrumb schema
+- No source citations
+- Missing update dates
+
+**LOW (Optimize When Possible)**
+- Image format optimization (move to webp)
+- Adding more internal links
+- Improving sentence length
+- Adding more semantic HTML elements
+- Adding hreflang for single-language sites
+- Multiple favicon sizes
+
+### Page-Specific Recommendations
+
+In crawl mode, after global recommendations, provide **page-specific recommendations** for each page:
+
+```
+### Page: [Page Title] — [URL]
+**Page Score:** XX/100
+**Page Type:** [Homepage/Blog/Product/etc.]
+
+**Top 3 Issues on This Page:**
+1. [Issue] — [Specific fix for this page]
+2. [Issue] — [Specific fix for this page]
+3. [Issue] — [Specific fix for this page]
+
+**Content Suggestions for This Page:**
+- [Specific content to add based on what's currently on the page]
+- [Questions to answer based on the page topic]
+- [Data/statistics to include]
+```
+
+### Cross-Page Analysis (Crawl Mode Only)
+
+After individual page analysis, provide site-wide insights:
+
+1. **Internal Linking Map** — which pages link to which, identify orphan pages
+2. **Content Gaps** — topics the site should cover but doesn't
+3. **Schema Coverage** — which pages have/lack structured data
+4. **Consistency Issues** — brand name variations, different navigation structures
+5. **Strongest Page** — highest scoring page and why
+6. **Weakest Page** — lowest scoring page and what to prioritize
+
+---
+
+## Step 5: Generate the HTML Report
 
 1. Read the report template from `templates/report-template.html` relative to this SKILL.md file. Use the Glob tool to find the template file by searching for `**/report-template.html`, then read it with the Read tool.
 
@@ -170,25 +314,25 @@ Weighted sum of category scores:
 ### Header Placeholders
 - `{{URL}}` — the audited URL
 - `{{DOMAIN}}` — just the domain name
-- `{{DATE}}` — current date in "April 16, 2026" format
+- `{{DATE}}` — current date formatted (e.g., "April 16, 2026")
 - `{{MODE_LABEL}}` — "Single Page Audit" or "Multi-Page Crawl (X pages)"
 
 ### Score Gauge Placeholders
 - `{{OVERALL_SCORE}}` — numeric score 0-100
-- `{{OVERALL_COLOR}}` — color hex based on score (pass/warning/fail)
-- `{{DASH_ARRAY}}` — SVG circle circumference: `490` (2 × π × 78)
-- `{{DASH_OFFSET}}` — calculated as: `490 - (490 × score / 100)`
+- `{{OVERALL_COLOR}}` — color based on score: `#00b894` (90+), `#74b9ff` (70-89), `#fdcb6e` (50-69), `#e17055` (<50)
+- `{{DASH_ARRAY}}` — `490` (2 × π × 78)
+- `{{DASH_OFFSET}}` — `490 - (490 × score / 100)`
 - `{{GRADE_CLASS}}` — `grade-excellent`, `grade-good`, `grade-needs-work`, or `grade-critical`
 - `{{GRADE_LABEL}}` — "Excellent", "Good", "Needs Work", or "Critical"
 
 ### Stats Placeholders
-- `{{PASS_COUNT}}` — number of passed checks
-- `{{WARNING_COUNT}}` — number of warnings
-- `{{FAIL_COUNT}}` — number of failed checks
-- `{{TOTAL_CHECKS}}` — total checks performed
+- `{{PASS_COUNT}}` — total passed checks across all pages
+- `{{WARNING_COUNT}}` — total warnings across all pages
+- `{{FAIL_COUNT}}` — total failed checks across all pages
+- `{{TOTAL_CHECKS}}` — total checks performed across all pages
 
 ### Category Cards
-Replace `{{CATEGORY_CARDS}}` with HTML for 6 cards. Each card:
+Replace `{{CATEGORY_CARDS}}` with 6 cards:
 ```html
 <div class="cat-card">
   <div class="cat-icon">ICON</div>
@@ -198,16 +342,10 @@ Replace `{{CATEGORY_CARDS}}` with HTML for 6 cards. Each card:
 </div>
 ```
 
-Use these icons for categories:
-- Design & UX: `🎨`
-- Content Readability: `📖`
-- Technical SEO: `⚙️`
-- Structured Data: `🏗️`
-- AEO: `💬`
-- GEO: `🤖`
+Icons: Design & UX `🎨` | Content Readability `📖` | Technical SEO `⚙️` | Structured Data `🏗️` | AEO `💬` | GEO `🤖`
 
 ### Findings Sections
-Replace `{{FINDINGS_SECTIONS}}` with one section per category:
+Replace `{{FINDINGS_SECTIONS}}` with one collapsible section per category. Each section contains one row per parameter:
 ```html
 <div class="section">
   <div class="section-header">
@@ -216,91 +354,118 @@ Replace `{{FINDINGS_SECTIONS}}` with one section per category:
     <span class="chevron">▼</span>
   </div>
   <div class="section-body">
-    <!-- One finding per parameter -->
     <div class="finding">
       <div class="finding-badge badge-STATUS">ICON</div>
       <div class="finding-content">
         <div class="finding-title">PARAMETER NAME</div>
-        <div class="finding-detail">EXPLANATION OF WHAT WAS FOUND</div>
+        <div class="finding-detail">
+          <strong>Found:</strong> [what was actually found in the HTML]<br>
+          <strong>Why it matters:</strong> [SEO/AEO/GEO impact]<br>
+          <strong>Recommendation:</strong> [specific fix with code example]
+        </div>
       </div>
     </div>
   </div>
 </div>
 ```
 
-Finding badges:
-- PASS: `badge-pass` with icon `✓`
-- WARNING: `badge-warning` with icon `!`
-- FAIL: `badge-fail` with icon `✗`
+Finding badges: PASS → `badge-pass` `✓` | WARNING → `badge-warning` `!` | FAIL → `badge-fail` `✗`
 
-### Recommendations
-Replace `{{RECOMMENDATIONS}}` with prioritized items:
+### Recommendations Section
+Replace `{{RECOMMENDATIONS}}` with prioritized actionable items:
 ```html
 <div class="reco-item">
   <span class="reco-priority priority-LEVEL">LEVEL</span>
   <div class="reco-content">
     <div class="reco-title">WHAT TO FIX</div>
-    <div class="reco-detail">HOW TO FIX IT</div>
-    <div class="reco-impact">Impact: WHAT IMPROVES</div>
+    <div class="reco-detail">
+      <strong>Current:</strong> [what exists now]<br>
+      <strong>Fix:</strong> [exact code/content change needed]<br>
+      <strong>Example:</strong> <code>[code snippet]</code>
+    </div>
+    <div class="reco-impact">Impact: [what improves] | Effort: [Quick Fix / Medium / Major]</div>
   </div>
 </div>
 ```
 
-Priority rules:
-- **HIGH**: Any FAIL in Technical SEO or GEO categories
-- **MEDIUM**: Any WARNING in any category, or FAIL in other categories
-- **LOW**: Optimization suggestions for items that already pass
-
-### Multi-Page Tabs
-If crawl mode, replace `{{PAGE_TABS}}` with:
+### Multi-Page Tabs (Crawl Mode)
+Replace `{{PAGE_TABS}}` with tabs for each page:
 ```html
 <div class="page-tabs">
-  <button class="page-tab active" data-page="page-1">Homepage</button>
-  <button class="page-tab" data-page="page-2">Page Title</button>
+  <button class="page-tab active" data-page="page-1">Homepage (XX/100)</button>
+  <button class="page-tab" data-page="page-2">About Us (XX/100)</button>
   ...
 </div>
 ```
-And wrap each page's findings in `<div class="page-content" id="page-N">`.
+Wrap each page's findings in `<div class="page-content" id="page-N">`. Include per-page scores in tab labels.
 
 If single page mode, set `{{PAGE_TABS}}` to empty string.
 
-3. Write the completed HTML to: `audit-report-{{DOMAIN}}-{{DATE_SHORT}}.html` in the current working directory (where the user invoked the skill).
+3. Write the completed HTML to: `audit-report-{{DOMAIN}}-{{DATE_SHORT}}.html` in the current working directory.
 
-## Step 5: Present Results
+---
 
-After generating the report, give the user a brief summary:
+## Step 6: Present Results Summary
+
+After generating the report, present a comprehensive summary to the user:
 
 ```
 ## Audit Complete!
 
-**URL:** [the url]
+**URL:** [url]
+**Pages Analyzed:** [count]
 **Overall Score:** XX/100 (Grade)
+**Total Issues Found:** XX (X Critical, X High, X Medium, X Low)
 
 ### Category Scores
-| Category | Score |
-|----------|-------|
-| Technical SEO | XX/100 |
-| GEO | XX/100 |
-| Design & UX | XX/100 |
-| Content Readability | XX/100 |
-| Structured Data | XX/100 |
-| AEO | XX/100 |
+| Category | Score | Status |
+|----------|-------|--------|
+| Technical SEO | XX/100 | [emoji] |
+| GEO | XX/100 | [emoji] |
+| Design & UX | XX/100 | [emoji] |
+| Content Readability | XX/100 | [emoji] |
+| Structured Data | XX/100 | [emoji] |
+| AEO | XX/100 | [emoji] |
 
-### Top Issues
-1. [Most critical issue]
-2. [Second issue]
-3. [Third issue]
+### Per-Page Scores (Crawl Mode)
+| Page | Type | Score | Top Issue |
+|------|------|-------|-----------|
+| Homepage | Landing | XX/100 | [issue] |
+| About | Info | XX/100 | [issue] |
+| Blog Post | Content | XX/100 | [issue] |
 
-📄 Full report saved to: `audit-report-domain-date.html`
-Open it in your browser for the interactive version with detailed findings and recommendations.
+### Top 5 Critical Fixes (Do These First)
+1. **[Issue]** — [One-line fix description] (Impact: [what improves])
+2. **[Issue]** — [One-line fix description] (Impact: [what improves])
+3. **[Issue]** — [One-line fix description] (Impact: [what improves])
+4. **[Issue]** — [One-line fix description] (Impact: [what improves])
+5. **[Issue]** — [One-line fix description] (Impact: [what improves])
+
+### Quick Wins (Under 5 Minutes Each)
+- [Quick fix 1]
+- [Quick fix 2]
+- [Quick fix 3]
+
+### Content Strategy Recommendations
+- [Content gap or opportunity based on analysis]
+- [Topic to cover for better GEO]
+- [Questions to answer for better AEO]
+
+Full interactive report saved to: `audit-report-domain-date.html`
+Open it in your browser for detailed findings, code examples, and all recommendations.
 ```
 
-## Important Notes
+---
 
-- Be thorough but fair — give credit where due
-- Be specific in findings — quote actual HTML elements found (or not found)
-- Recommendations should be actionable with clear steps
-- For content analysis (readability, GEO), analyze the actual visible text content
-- For multi-page crawl, show aggregate scores AND per-page breakdowns
-- Color coding: green (#00b894) for pass, yellow (#fdcb6e) for warning, red (#e17055) for fail
-- The report must be fully self-contained — no external CSS/JS dependencies
+## Important Rules
+
+1. **Be exhaustive** — analyze EVERY parameter on EVERY page. Never skip or summarize vaguely.
+2. **Be specific** — quote actual HTML found (or not found). Don't say "some issues found" — say exactly what.
+3. **Be actionable** — every recommendation must include the exact code or content change needed.
+4. **Be evidence-based** — cite why each fix matters with data where possible (e.g., "pages with meta descriptions get 5.8% higher CTR").
+5. **Be prioritized** — always order recommendations by business impact, not by category order.
+6. **Be fair** — celebrate what's done well. Start each category with what's passing before listing issues.
+7. **Provide code examples** — for every technical fix, show the exact HTML/JSON-LD code to add or change.
+8. **Think like a consultant** — give strategic advice, not just a checklist. Explain the "so what" behind every finding.
+9. **For multi-page crawl** — provide BOTH per-page analysis AND cross-site patterns/recommendations.
+10. **The report must be fully self-contained** — no external CSS/JS dependencies, everything inline.

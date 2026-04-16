@@ -20,6 +20,8 @@
     --warning-bg: rgba(253,203,110,0.1);
     --fail: #e17055;
     --fail-bg: rgba(225,112,85,0.1);
+    --critical: #d63031;
+    --critical-bg: rgba(214,48,49,0.15);
     --info: #74b9ff;
     --radius: 12px;
     --shadow: 0 4px 24px rgba(0,0,0,0.3);
@@ -70,6 +72,13 @@
   .header .date {
     color: var(--text-muted);
     font-size: 13px;
+  }
+
+  .header .pages-analyzed {
+    color: var(--accent-light);
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 600;
   }
 
   /* ─── Overall Score Gauge ─── */
@@ -275,7 +284,12 @@
   .finding-detail {
     font-size: 13px;
     color: var(--text-muted);
-    line-height: 1.5;
+    line-height: 1.6;
+  }
+
+  .finding-detail strong {
+    color: var(--text);
+    font-weight: 600;
   }
 
   .finding-detail code {
@@ -283,6 +297,32 @@
     padding: 2px 6px;
     border-radius: 4px;
     font-size: 12px;
+    color: var(--accent-light);
+    word-break: break-all;
+  }
+
+  .finding-detail pre {
+    background: var(--surface-2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    color: var(--accent-light);
+    line-height: 1.5;
+  }
+
+  .finding-reco {
+    margin-top: 8px;
+    padding: 10px 14px;
+    background: rgba(108,92,231,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    font-size: 13px;
+    color: var(--text);
+  }
+
+  .finding-reco strong {
     color: var(--accent-light);
   }
 
@@ -300,6 +340,20 @@
     border-bottom: 1px solid var(--border);
     font-size: 18px;
     font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .reco-subheader {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .reco-item {
@@ -325,6 +379,7 @@
     margin-top: 2px;
   }
 
+  .priority-critical { background: var(--critical-bg); color: var(--critical); }
   .priority-high { background: var(--fail-bg); color: var(--fail); }
   .priority-medium { background: var(--warning-bg); color: var(--warning); }
   .priority-low { background: rgba(116,185,255,0.1); color: var(--info); }
@@ -342,13 +397,49 @@
   .reco-detail {
     font-size: 13px;
     color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .reco-detail strong {
+    color: var(--text);
+  }
+
+  .reco-detail code {
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--accent-light);
+  }
+
+  .reco-detail pre {
+    background: var(--surface-2);
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-top: 8px;
+    overflow-x: auto;
+    font-size: 12px;
+    color: var(--accent-light);
+    line-height: 1.5;
   }
 
   .reco-impact {
     font-size: 12px;
-    color: var(--accent-light);
-    margin-top: 4px;
+    margin-top: 8px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
   }
+
+  .reco-impact-tag {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .impact-tag-effect { background: var(--pass-bg); color: var(--pass); }
+  .impact-tag-effort { background: rgba(108,92,231,0.1); color: var(--accent-light); }
+  .impact-tag-page { background: rgba(116,185,255,0.1); color: var(--info); }
 
   /* ─── Multi-page Tabs ─── */
   .page-tabs {
@@ -373,6 +464,9 @@
     color: var(--text-muted);
     transition: all 0.2s;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .page-tab:hover, .page-tab.active {
@@ -381,13 +475,120 @@
     border-color: var(--accent);
   }
 
+  .page-tab .tab-score {
+    font-weight: 700;
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.15);
+  }
+
+  .page-tab.active .tab-score {
+    background: rgba(255,255,255,0.25);
+  }
+
   .page-content { display: none; }
   .page-content.active { display: block; }
+
+  /* ─── Page Summary Card ─── */
+  .page-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .page-summary-info {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .page-summary-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .page-summary-url {
+    font-size: 12px;
+    color: var(--text-muted);
+    word-break: break-all;
+  }
+
+  .page-summary-type {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(108,92,231,0.1);
+    color: var(--accent-light);
+    margin-top: 6px;
+  }
+
+  .page-summary-score {
+    font-size: 36px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  /* ─── Cross-Page Analysis ─── */
+  .cross-analysis {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .cross-analysis-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cross-analysis-body {
+    padding: 20px 24px;
+  }
+
+  .cross-analysis-item {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cross-analysis-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .cross-analysis-item h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--accent-light);
+  }
+
+  .cross-analysis-item p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
 
   /* ─── Summary Stats ─── */
   .stats-row {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
     margin-bottom: 24px;
   }
@@ -413,6 +614,54 @@
     letter-spacing: 0.5px;
   }
 
+  /* ─── Quick Wins Section ─── */
+  .quick-wins {
+    background: var(--surface);
+    border: 1px solid var(--pass);
+    border-radius: var(--radius);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .quick-wins-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--pass);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .quick-win-item {
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .quick-win-item:last-child {
+    border-bottom: none;
+  }
+
+  .quick-win-check {
+    color: var(--pass);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .quick-win-text {
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .quick-win-text strong {
+    color: var(--accent-light);
+  }
+
   /* ─── Footer ─── */
   .footer {
     text-align: center;
@@ -434,9 +683,14 @@
   /* ─── Print ─── */
   @media print {
     body { background: white; color: #1a1a1a; }
-    .section, .cat-card, .reco-section, .header { border-color: #ddd; background: white; box-shadow: none; }
+    .section, .cat-card, .reco-section, .header, .cross-analysis, .quick-wins, .page-summary {
+      border-color: #ddd; background: white; box-shadow: none;
+    }
     .section-body.collapsed { display: block !important; }
+    .page-content { display: block !important; }
     .header h1 { -webkit-text-fill-color: #333; background: none; }
+    .finding-reco { border-left-color: #666; background: #f5f5f5; }
+    .page-tabs { display: none; }
   }
 
   /* ─── Responsive ─── */
@@ -445,8 +699,11 @@
     .header { padding: 32px 16px; }
     .categories { grid-template-columns: repeat(2, 1fr); }
     .finding { flex-direction: column; }
+    .reco-item { flex-direction: column; }
     .gauge-wrap { width: 140px; height: 140px; }
     .gauge-score .number { font-size: 36px; }
+    .page-summary { flex-direction: column; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -458,7 +715,8 @@
   <div class="header">
     <h1>Website Audit Report</h1>
     <div class="url">{{URL}}</div>
-    <div class="date">Generated on {{DATE}} {{MODE_LABEL}}</div>
+    <div class="date">Generated on {{DATE}}</div>
+    <div class="pages-analyzed">{{MODE_LABEL}}</div>
 
     <div class="score-gauge">
       <div class="gauge-wrap">
@@ -497,6 +755,10 @@
       <div class="stat-value" style="color:var(--info)">{{TOTAL_CHECKS}}</div>
       <div class="stat-label">Total Checks</div>
     </div>
+    <div class="stat-box">
+      <div class="stat-value" style="color:var(--accent-light)">{{PAGES_COUNT}}</div>
+      <div class="stat-label">Pages</div>
+    </div>
   </div>
 
   <!-- ═══ CATEGORY SCORES ═══ -->
@@ -504,11 +766,20 @@
     {{CATEGORY_CARDS}}
   </div>
 
+  <!-- ═══ QUICK WINS ═══ -->
+  {{QUICK_WINS}}
+
   <!-- ═══ MULTI-PAGE TABS (if crawl mode) ═══ -->
   {{PAGE_TABS}}
 
-  <!-- ═══ DETAILED FINDINGS ═══ -->
+  <!-- ═══ PER-PAGE SUMMARIES & FINDINGS ═══ -->
+  {{PAGE_FINDINGS}}
+
+  <!-- ═══ DETAILED FINDINGS (single page) ═══ -->
   {{FINDINGS_SECTIONS}}
+
+  <!-- ═══ CROSS-PAGE ANALYSIS (crawl mode) ═══ -->
+  {{CROSS_ANALYSIS}}
 
   <!-- ═══ RECOMMENDATIONS ═══ -->
   <div class="reco-section">
@@ -518,8 +789,9 @@
 
   <!-- ═══ FOOTER ═══ -->
   <div class="footer">
-    Generated by <strong>Website Audit Skill</strong> &mdash; Claude Code Marketing Skills<br>
-    Report covers SEO, AEO (Answer Engine Optimization) & GEO (Generative Engine Optimization)
+    Generated by <strong>Website Audit Skill</strong> &mdash; Claude Code Marketing Skills by Ashish Chikane<br>
+    Report covers SEO, AEO (Answer Engine Optimization) & GEO (Generative Engine Optimization)<br>
+    <a href="https://github.com/AshishChikane/marketing-skills-audit">github.com/AshishChikane/marketing-skills-audit</a>
   </div>
 
 </div>
