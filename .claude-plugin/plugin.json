@@ -1,0 +1,9 @@
+{
+  "name": "marketing-skills-audit",
+  "description": "Comprehensive website audit skill for SEO, AEO (Answer Engine Optimization) & GEO (Generative Engine Optimization). Analyzes 60+ parameters across design, content, technical SEO, structured data, AEO, and GEO — generates an interactive HTML report.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ashish Chikane",
+    "github": "AshishChikane"
+  }
+}
