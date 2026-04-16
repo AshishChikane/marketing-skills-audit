@@ -23,8 +23,19 @@ Parse the input to extract the URL and mode (single or crawl).
 
 Use the `WebFetch` tool to retrieve the HTML content.
 
+### For ALL Modes (Single & Crawl) — Fetch robots.txt & Sitemap
+Before auditing any page, ALWAYS fetch these two critical files first:
+
+1. **Fetch `{domain}/robots.txt`** using WebFetch
+   - Record the full contents
+   - This will be audited in Step 2 under the new "Robots.txt & Crawlability" checks
+
+2. **Fetch `{domain}/sitemap.xml`** using WebFetch
+   - If not found at `/sitemap.xml`, check for sitemap URL listed in robots.txt (`Sitemap:` directive)
+   - Record whether it exists, its format, and how many URLs it contains
+
 ### Single Page Mode
-Fetch the given URL and perform a deep audit on that single page.
+Fetch the given URL and perform a deep audit on that single page (plus robots.txt & sitemap as above).
 
 ### Crawl Mode — Full Site Discovery
 1. **Fetch the homepage** first
@@ -50,7 +61,7 @@ Fetch the given URL and perform a deep audit on that single page.
 
 ## Step 2: Deep Per-Page Analysis
 
-**CRITICAL: Analyze EVERY page individually.** Do not skip pages or give generic assessments. For each page, examine the actual HTML and content against ALL 58 parameters below. For each parameter, assign:
+**CRITICAL: Analyze EVERY page individually.** Do not skip pages or give generic assessments. For each page, examine the actual HTML and content against ALL 68 parameters below (58 per-page + 10 site-wide robots.txt/crawlability). For each parameter, assign:
 - **PASS** (100 pts) — meets best practices
 - **WARNING** (50 pts) — partially meets, needs improvement
 - **FAIL** (0 pts) — missing or critically broken
@@ -62,7 +73,7 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 1: Design & UX (Weight: 15%)
+### Category 1: Design & UX (Weight: 10%)
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
@@ -80,7 +91,7 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 2: Content Readability (Weight: 15%)
+### Category 2: Content Readability (Weight: 10%)
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
@@ -126,7 +137,33 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 4: Content Hierarchy & Structured Data (Weight: 15%)
+### Category 4: Robots.txt & Crawlability (Weight: 10%) — SITE-WIDE
+
+**This category is audited ONCE for the entire site (not per-page).** Fetch `{domain}/robots.txt` and `{domain}/sitemap.xml` and analyze them.
+
+| # | Parameter | PASS | WARNING | FAIL |
+|---|-----------|------|---------|------|
+| 1 | **Robots.txt Exists** | `/robots.txt` returns 200 with valid content | Returns 200 but is empty or has only comments | Returns 404 — no robots.txt file |
+| 2 | **User-Agent Rules** | Has specific rules for `User-agent: *` and/or major bots (Googlebot, Bingbot) | Only has `User-agent: *` with no specific bot rules | No user-agent directives at all |
+| 3 | **Disallow Rules Check** | Disallow rules are intentional (blocks admin, private, staging areas only) | Has broad disallow rules that may accidentally block important pages (e.g., `Disallow: /blog` or `Disallow: /products`) | `Disallow: /` blocks the ENTIRE site from crawling |
+| 4 | **Allow Rules** | Uses `Allow:` directives to explicitly permit important paths within disallowed directories | No allow rules needed (disallows are minimal) — PASS | Critical pages blocked with no `Allow:` override |
+| 5 | **Sitemap Directive** | `Sitemap:` directive present in robots.txt pointing to valid sitemap URL | Sitemap URL in robots.txt but returns 404 or error | No `Sitemap:` directive in robots.txt |
+| 6 | **Sitemap.xml Exists** | `/sitemap.xml` exists, returns valid XML with page URLs | Sitemap exists but is malformed, empty, or has very few URLs | No sitemap found at `/sitemap.xml` or robots.txt-specified location |
+| 7 | **Sitemap Completeness** | Sitemap contains all key pages (homepage, main sections, blog posts, products) | Sitemap exists but missing major pages found during crawl | Sitemap has <5 URLs or is clearly incomplete |
+| 8 | **Crawl-Delay** | No `Crawl-delay` directive (allows fast crawling) or reasonable delay (≤5 seconds) | `Crawl-delay` set to 5-30 seconds (may slow indexing) | `Crawl-delay` >30 seconds (severely limits crawling) |
+| 9 | **AI Bot Directives** | No blocks on AI crawlers (GPTBot, ChatGPT-User, Google-Extended, Anthropic, CCBot, Bytespider) or intentional blocks with clear strategy | Some AI bots blocked, others allowed — inconsistent strategy | All AI crawlers blocked — site will NOT appear in AI-generated answers (ChatGPT, Perplexity, Google AI Overview, Claude) |
+| 10 | **Clean Syntax** | Robots.txt uses correct syntax, no typos, proper formatting | Minor syntax issues (extra spaces, inconsistent formatting) but parseable | Major syntax errors that make rules ambiguous or uninterpretable |
+
+**Per-parameter recommendation format:**
+- If FAIL on Robots.txt Exists: "No robots.txt found at `{domain}/robots.txt`. **Action:** Create a `robots.txt` file at the root of your domain with: ```\nUser-agent: *\nAllow: /\n\nSitemap: https://{domain}/sitemap.xml\n``` Without this, search engines will crawl everything by default (which may be fine), but you miss the opportunity to point them to your sitemap and control crawl behavior."
+- If FAIL on Disallow Rules: "Your robots.txt has `Disallow: /` which BLOCKS ALL SEARCH ENGINES from crawling your entire site. This is the most critical issue — your site will NOT appear in any search results. **Action:** Immediately change to: ```\nUser-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /private/\nDisallow: /staging/\n``` Only block paths that should genuinely be private."
+- If FAIL on AI Bot Directives: "Your robots.txt blocks AI crawlers:\n  ```\n  [quote the actual blocking rules found]\n  ```\n  This means your content will NOT be cited in ChatGPT, Perplexity, Google AI Overview, or Claude answers. **Impact:** You're losing significant visibility in AI-powered search. **Action:** If you want AI traffic, remove these blocks:\n  ```\n  # REMOVE these lines:\n  User-agent: GPTBot\n  Disallow: /\n  User-agent: ChatGPT-User\n  Disallow: /\n  ```\n  If blocking AI is intentional (to protect content), document your strategy. But know that competitors who allow AI crawling will be cited instead."
+- If FAIL on Sitemap: "No sitemap.xml found. **Action:** Generate a sitemap at `https://{domain}/sitemap.xml` containing all public pages. Use format:\n  ```xml\n  <?xml version=\"1.0\" encoding=\"UTF-8\"?>\n  <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n    <url>\n      <loc>https://{domain}/</loc>\n      <lastmod>2026-04-16</lastmod>\n      <priority>1.0</priority>\n    </url>\n    <url>\n      <loc>https://{domain}/about</loc>\n      <lastmod>2026-04-16</lastmod>\n      <priority>0.8</priority>\n    </url>\n  </urlset>\n  ```\n  Then add `Sitemap: https://{domain}/sitemap.xml` to your robots.txt. Sitemaps help Google discover and index pages 30% faster."
+- If WARNING/FAIL on Sitemap Completeness: "Sitemap has X URLs but we found Y pages during crawl. Missing pages: [list URLs not in sitemap]. **Action:** Add these pages to your sitemap. Most CMS platforms (WordPress, Next.js, etc.) have plugins/packages that auto-generate sitemaps."
+
+---
+
+### Category 5: Content Hierarchy & Structured Data (Weight: 10%)
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
@@ -145,7 +182,7 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 5: AEO — Answer Engine Optimization (Weight: 15%)
+### Category 6: AEO — Answer Engine Optimization (Weight: 10%)
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
@@ -164,7 +201,7 @@ For every single finding, you MUST provide:
 
 ---
 
-### Category 6: GEO — Generative Engine Optimization (Weight: 20%)
+### Category 7: GEO — Generative Engine Optimization (Weight: 20%)
 
 | # | Parameter | PASS | WARNING | FAIL |
 |---|-----------|------|---------|------|
@@ -206,10 +243,12 @@ Average of all per-page scores.
 ### Weighted Formula
 - Technical SEO: **20%**
 - GEO: **20%**
-- Design & UX: **15%**
-- Content Readability: **15%**
-- Content Hierarchy & Structured Data: **15%**
-- AEO: **15%**
+- Design & UX: **10%**
+- Content Readability: **10%**
+- Robots.txt & Crawlability: **10%**
+- Content Hierarchy & Structured Data: **10%**
+- AEO: **10%**
+- *(Note: Robots.txt category is scored once for the entire site and applied to all pages)*
 
 ### Grade
 - **90-100**: Excellent
@@ -332,7 +371,7 @@ After individual page analysis, provide site-wide insights:
 - `{{TOTAL_CHECKS}}` — total checks performed across all pages
 
 ### Category Cards
-Replace `{{CATEGORY_CARDS}}` with 6 cards:
+Replace `{{CATEGORY_CARDS}}` with 7 cards:
 ```html
 <div class="cat-card">
   <div class="cat-icon">ICON</div>
@@ -342,7 +381,7 @@ Replace `{{CATEGORY_CARDS}}` with 6 cards:
 </div>
 ```
 
-Icons: Design & UX `🎨` | Content Readability `📖` | Technical SEO `⚙️` | Structured Data `🏗️` | AEO `💬` | GEO `🤖`
+Icons: Design & UX `🎨` | Content Readability `📖` | Technical SEO `⚙️` | Robots.txt & Crawlability `🕷️` | Structured Data `🏗️` | AEO `💬` | GEO `🤖`
 
 ### Findings Sections
 Replace `{{FINDINGS_SECTIONS}}` with one collapsible section per category. Each section contains one row per parameter:
@@ -422,6 +461,7 @@ After generating the report, present a comprehensive summary to the user:
 |----------|-------|--------|
 | Technical SEO | XX/100 | [emoji] |
 | GEO | XX/100 | [emoji] |
+| Robots.txt & Crawlability | XX/100 | [emoji] |
 | Design & UX | XX/100 | [emoji] |
 | Content Readability | XX/100 | [emoji] |
 | Structured Data | XX/100 | [emoji] |
